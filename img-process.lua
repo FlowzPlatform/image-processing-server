@@ -270,11 +270,11 @@ function text( d )
   end
 
   if ngx.var.arg_cylinder then
-     img:custom_cylinderize("vertical",250.03813405274, 100.029, 15.6667, 15.145578659481, 1.75, 0.0,90.00)
-     -- local imgSrc = magick.load_image("html/mugs.jpg")
-     imgSrc:resize(500,500)
-     imgSrc:composite(img, -120, 150, "SrcOverCompositeOp")
-     img = imgSrc
+     -- img:custom_cylinderize("vertical",250.03813405274, 100.029, 15.6667, 15.145578659481, 1.75, 0.0,90.00)
+     -- -- local imgSrc = magick.load_image("html/mugs.jpg")
+     -- -- imgSrc:resize(500,500)
+     -- imgSrc:composite(img, -120, 150, "SrcOverCompositeOp")
+     -- img = imgSrc
   end
 
   if ngx.var.arg_firebranded then
@@ -488,11 +488,33 @@ function image( j )
     end
 
     if ngx.var.arg_cylinder then
-       img:custom_cylinderize("vertical",250.03813405274, 100.029, 15.6667, 15.145578659481, 1.75, 0.0,90.00)
-       -- local imgSrc = magick.load_image("html/mugs.jpg")
-       imgSrc:resize(500,500)
-       imgSrc:composite(img, -120, 150, "SrcOverCompositeOp")
-       img = imgSrc
+      local imageWidth, imageHeight = img:get_width(), img:get_height()
+      local HH = imageWidth/4
+      local WW = imageHeight
+      
+      local ratio = imageHeight/imageWidth
+      local radius = imageHeight/2
+      local wrap = (((imageWidth*100/tonumber(artwork_width)))/2 >0) and ((imageWidth*100/tonumber(artwork_width)))/2 or 35;
+      wrap = (wrap > 100) and 100 or wrap;
+      wrap = (wrap < 35) and 35 or wrap;
+
+
+
+
+
+      -- const char *mod, double radius, double length, double wrap, double pitch, double efact, double angle,double narrow
+      -- img:custom_cylinderize("vertical", 200, 100.029, 15.6667, 15.145578659481, 1.75, 0.0, 90.00)
+      -- img:custom_cylinderize("vertical", radius, imageHeight, wrap, 6.6228250679836, 1.75, 0.0, 86.980498717716)
+      -- img:custom_cylinderize("vertical", HH, WW, 50, 20, 1, 0.0, 100)
+
+      -- local imgSrc = magick.load_image("html/mugs.jpg")
+      -- imgSrc:resize(500,500)
+      -- imgSrc:composite(img, -120, 150, "SrcOverCompositeOp")
+      -- img = imgSrc
+    end
+
+    if ngx.var.arg_glass then
+      img:glassImage();
     end
 
     if ngx.var.arg_firebranded then
@@ -574,6 +596,10 @@ function image( j )
     x_cord_x = artwork_left - images_x[j]
     y_cord_x = artwork_top - images_y[j]
 
+    print(x_cord_x .. y_cord_x)
+    print(artwork_width .. artwork_height)
+
+
     img:crop(tonumber(artwork_width), tonumber(artwork_height), x_cord_x, y_cord_x)
     
     -- negative right side
@@ -607,6 +633,8 @@ function image( j )
 
       imgSrc:composite(img, composite_x, composite_y, "SrcOverCompositeOp")
     end
+
+    -- imgSrc = img
 end
 
 process_img()
