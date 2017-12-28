@@ -215,6 +215,7 @@ if ngx.var.arg_firebranded then
 end
 
 if ngx.var.arg_wooden then
+  print("Ola")
   local woodenImg = magick.load_image("html/wood.jpg")
   woodenImg:wooden(img, "carve", 12, 3, "25", 0.0, 135, 2, 40, "black,white", 125.0, 100.0, 1)
   img = woodenImg
@@ -315,9 +316,9 @@ No need to write image physically
 write image physically and display
 ]]--
 
-img:transparent_background('white')
+-- img:transparent_background('white')
 
 
-img:write("html/resized.png")
+img:write("html/resized.jpg")
 img:destroy()
-ngx.exec("/resized.png")
+ngx.exec("/resized.jpg")
