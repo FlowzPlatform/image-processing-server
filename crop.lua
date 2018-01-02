@@ -1,8 +1,9 @@
-
 local magick = require "magick"
 local cjson = require "cjson"
 
--- ngx.header.content_type = 'application/json'
+ngx.header["Content-Type"] = 'application/json; charset=utf-8'
+ngx.header["Access-Control-Allow-Origin"] = ngx.var.http_origin
+ngx.header["Access-Control-Allow-Credentials"] = "true"
 
 local img
 img = magick.load_image("html/user-uploaded-images/" .. ngx.var.arg_image)
@@ -12,9 +13,4 @@ img:crop(tonumber(ngx.var.arg_w), tonumber(ngx.var.arg_h), tonumber(ngx.var.arg_
 img:write("html/user-uploaded-images/" .. ngx.var.arg_image)
 img:destroy()
 
-local value = {}
-value['message'] = 'Cropped successfully'
-local response = cjson.encode(value)
-
-ngx.say(response)
--- ngx.exec("/user-uploaded-images/" .. ngx.var.arg_image)
+ngx.say(cjson.encode({ message = 'Cropped successfully' }))

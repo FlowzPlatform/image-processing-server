@@ -1,3 +1,9 @@
+local cjson = require "cjson"
+ngx.header["Content-Type"] = 'application/json; charset=utf-8'
+ngx.header["Access-Control-Allow-Origin"] = ngx.var.http_origin
+ngx.header["Access-Control-Allow-Credentials"] = "true"
+
+
 local sig, size, path, ext = ngx.var.arg_sig, ngx.var.arg_size, ngx.var.path, ngx.var.ext
 local height, width, rotate, single_color = (ngx.var.arg_h and ngx.var.arg_h or ""), (ngx.var.arg_w and ngx.var.arg_w or ""),
 (ngx.var.arg_rotate and ngx.var.arg_rotate or ""), (ngx.var.arg_single_color and ngx.var.arg_single_color or "")
@@ -407,7 +413,6 @@ end
 
 process_img()
 
-print(dest_fname)
 img:write(dest_fname)
 img:destroy()
-ngx.exec(ngx.var.request_uri .. '&image=' .. calculated_sig)
+ngx.say(cjson.encode({ image_url = 'http://localhost:6789/images/' .. calculated_sig .. '.' .. ext, image = calculated_sig .. '.' .. ext }))

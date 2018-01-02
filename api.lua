@@ -1,4 +1,5 @@
 local magick = require "magick"
+local cjson = require "cjson"
 img = magick.load_image("html/Bill_Murray_small.jpg")
 -- img:size(100x100)
 -- img:resize(170, 97)
@@ -45,7 +46,7 @@ img = magick.load_image("html/Bill_Murray_small.jpg")
 -- img:custom_emboss(1, 135.0, 40.0, 10.0, 0.0, 42, 0.0)
 -- 'convert '. $newimage .' -alpha set -evaluate set 90% '.$newimage
 
-img:toneontoneImage();
+-- img:toneontoneImage();
 
 -- img:gel_dom();
 -- print(img:get_height())
@@ -61,6 +62,9 @@ img:toneontoneImage();
 -- local imgSrc = magick.load_image("html/yellow.gif.jpg")
 -- img:composite(imgSrc, 0, 0, "AtopCompositeOp")
 
-img:write("html/resize.jpg")
-img:destroy()
-ngx.exec("/resize.jpg")
+-- img:write("html/resize.jpg")
+-- img:destroy()
+-- ngx.exec("/resize.jpg")
+ngx.status = ngx.HTTP_OK
+ngx.say(cjson.encode({ status = true }))  
+return ngx.exit(ngx.HTTP_OK)
