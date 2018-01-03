@@ -16,18 +16,24 @@ local function calculate_signature(str)
     :sub(1,12)
 end
 
-local images, cylinder, height, width, fabric, compose_x, compose_y, area_left, area_top, area_w, area_h = 
+local images, cylinder, height, width, fabric, compose_x, compose_y, 
+area_left, area_top, area_w, area_h, cropped, orders, background, 
+four_colour, engrave, sig = 
 (ngx.var.arg_images and ngx.var.arg_images or ""), (ngx.var.arg_cylinder and ngx.var.arg_cylinder or ""),
 (ngx.var.arg_height and ngx.var.arg_height or ""), (ngx.var.arg_width and ngx.var.arg_width or ""),
 (ngx.var.arg_fabric and ngx.var.arg_fabric or ""), (ngx.var.arg_compose_x and ngx.var.arg_compose_x or ""),
 (ngx.var.arg_compose_y and ngx.var.arg_compose_y or ""), (ngx.var.arg_area_left and ngx.var.arg_area_left or ""),
 (ngx.var.arg_area_top and ngx.var.arg_area_top or ""), (ngx.var.arg_area_w and ngx.var.arg_area_w or ""),
-(ngx.var.arg_area_h and ngx.var.arg_area_h or "")
+(ngx.var.arg_area_h and ngx.var.arg_area_h or ""), (ngx.var.arg_cropped and ngx.var.arg_cropped or ""),
+(ngx.var.arg_orders and ngx.var.arg_orders or ""), (ngx.var.arg_back and ngx.var.arg_back or ""),
+(ngx.var.arg_f_color and ngx.var.arg_f_color or ""), (ngx.var.arg_engrave and ngx.var.arg_engrave or ""),
+(ngx.var.arg_sig and ngx.var.arg_sig or "")
 
-local calculated_sig = calculate_signature(path .. height .. width .. cylinder .. compose .. bevel .. fabric
-.. engrave .. four_colour .. dcolor .. foil .. geldom .. toneontone .. compose_x .. compose_y .. text .. font_size .. area_w .. area_h 
-.. font_size .. text_width .. text_height .. text_composex .. text_composey .. text_color .. text_flip .. text_flop .. text_rotate 
-.. font_family .. texts .. text_curve .. background .. orders .. cropped .. artwork_left .. artwork_top)
+local ext, path = ngx.var.ext, ngx.var.path
+
+local calculated_sig = calculate_signature(path .. height .. width .. cylinder .. fabric
+.. engrave .. four_colour .. compose_x .. compose_y .. area_w .. area_h      
+.. background .. orders .. cropped .. area_left .. area_top)
 
 if(calculate_signature("obVMC@123") ~= sig) then
   return_not_found("Invalid signature")
@@ -37,7 +43,7 @@ end
 local output_file = cache_dir .. calculated_sig .. "." .. ext
 local ofile = io.open(output_file)
 if ofile then
-  ngx.exec(ngx.var.request_uri .. '&image=' .. calculated_sig)
+--   ngx.exec(ngx.var.request_uri .. '&image=' .. calculated_sig)
 end
 
 local magick = require "magick"
@@ -74,14 +80,31 @@ function explode(d,p)
 end
 
 function process_img()
+    print(orders)
     orders_x = stringToArray(orders)
     for i, v in ipairs(orders_x) do      
-        local tt = explode("-", v)
-        image(tonumber(tt[2]), imgSrc)
+        local order = explode("-", v)
+        image(tonumber(order[2]))
     end
 end
 
-function image()
+local images_x, images_y, height_x, width_x, images_a  = {}, {}, {}, {}, {}
+images_x = stringToArray(compose_x)
+images_y = stringToArray(compose_y)
+height_x = stringToArray(height)
+width_x = stringToArray(width)
+images_a = stringToArray(images)
+
+local dest_fname = cache_dir .. calculated_sig .. "." .. ext
+local imgSrc = magick.load_image("html/product-images/" .. path)
+-- imgSrc:resize(tonumber(compose_w),tonumber(compose_h))
+
+
+function image(j)
+    print(j)
+    print(images_a[j])
+    local img = magick.load_image("cache/" .. images_a[j])
+
     if ngx.var.arg_fabric then
         local cmp_x,cmp_y = images_x[j],images_y[j]  
         local cordinate = width_x[j] .. 'x' .. height_x[j] .. '+' .. cmp_x .. '+' .. cmp_y
@@ -94,19 +117,17 @@ function image()
         img = imgSrc
     end
 
-    x_cord_x = artwork_left - images_x[j]
-    y_cord_x = artwork_top - images_y[j]
+    x_cord_x = tonumber(area_left) - tonumber(images_x[j])
+    y_cord_x = tonumber(area_top) - tonumber(images_y[j])
 
     -- print(x_cord_x .. y_cord_x)
     -- print(artwork_width .. artwork_height)
 
 
-    img:crop(tonumber(artwork_width), tonumber(artwork_height), x_cord_x, y_cord_x)
+    -- img:crop(tonumber(area_w), tonumber(area_h), x_cord_x, y_cord_x)
     
-    if background_a[j] ~= nil and background_a[j] ~= '' then 
-        for i in string.gmatch(background_a[j], '([^-]+)') do
-            img:transparent_background(i)
-        end
+    if background ~= nil and background ~= '' then 
+        img:transparent_background(background)
     end
 
     cmp_x,cmp_y = images_x[j],images_y[j]
@@ -132,10 +153,11 @@ function image()
             img:transparent_background(i)
         end
     end
-
 end
 
 
-local dest_fname = cache_dir .. calculated_sig .. "." .. ext
-local imgSrc = magick.load_image("html/product-images/" .. path)
-imgSrc:resize(tonumber(compose_w),tonumber(compose_h))
+process_img()
+
+imgSrc:write(dest_fname)
+imgSrc:destroy()
+ngx.exec(ngx.var.request_uri .. '&image=' .. calculated_sig)
