@@ -29,6 +29,9 @@ four_colour, engrave, sig =
 (ngx.var.arg_f_color and ngx.var.arg_f_color or ""), (ngx.var.arg_engrave and ngx.var.arg_engrave or ""),
 (ngx.var.arg_sig and ngx.var.arg_sig or "")
 
+local product_w, product_h = (ngx.var.arg_p_w and ngx.var.arg_p_w or 410) , (ngx.var.arg_p_h and ngx.var.arg_p_h or 500)
+
+
 local ext, path = ngx.var.ext, ngx.var.path
 
 local calculated_sig = calculate_signature(path .. height .. width .. cylinder .. fabric
@@ -97,7 +100,7 @@ images_a = stringToArray(images)
 
 local dest_fname = cache_dir .. calculated_sig .. "." .. ext
 local imgSrc = magick.load_image("html/product-images/" .. path)
--- imgSrc:resize(tonumber(compose_w),tonumber(compose_h))
+imgSrc:resize(tonumber(product_w),tonumber(product_h))
 
 
 function image(j)
@@ -124,7 +127,7 @@ function image(j)
     -- print(artwork_width .. artwork_height)
 
 
-    -- img:crop(tonumber(area_w), tonumber(area_h), x_cord_x, y_cord_x)
+    img:crop(tonumber(area_w), tonumber(area_h), x_cord_x, y_cord_x)
     
     if background ~= nil and background ~= '' then 
         img:transparent_background(background)

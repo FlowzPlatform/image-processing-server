@@ -280,6 +280,7 @@ function image()
       img:textToImage(ngx.unescape_uri(ngx.var.arg_text), fontF, tonumber(font_size), "#"..textColor, 1, {tonumber(text_curve)})
     else
       local source_fname = images_dir .. path
+      print(source_fname)
       local file = io.open(source_fname)
       if not file then
         return_not_found()
