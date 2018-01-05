@@ -144,14 +144,14 @@ local img
 function text()
   -- body
   local img
-  img = magick.new_image(tonumber(area_w_x), tonumber(area_h_x))
+  img = magick.new_image(tonumber(area_w), tonumber(area_h))
   text_location = '/home/software/new/virtual-ssr/static/fonts/'
   local fontF = text_location .. font_family
 
-  img:textToImage(ngx.unescape_uri(texts_a), fontF, tonumber(font_size_x), "#"..textColor, 1, {tonumber(text_curve_a)});
+  img:textToImage(ngx.unescape_uri(text), fontF, tonumber(font_size), "#"..textColor, 1, {tonumber(text_curve)});
 
   if ngx.var.arg_height and crop ~= "1" then
-    img:resize(tonumber(text_width), tonumber(text_height))
+    img:resize(tonumber(width), tonumber(height))
   end
 
   -- blur image
@@ -162,7 +162,7 @@ function text()
   --rotate image
   --Note: for graphicmagick, this is not available
   if text_rotate_a then
-    img:rotate(tonumber(text_rotate_a), 0, 0, 1)
+    img:rotate(tonumber(rotate), 0, 0, 1)
   end
 
   if ngx.var.arg_distort then
@@ -170,7 +170,7 @@ function text()
   end
 
   if ngx.var.arg_crop then
-    img:resize_and_crop(tonumber(text_width_x), tonumber(text_height_x))
+    img:resize_and_crop(tonumber(width), tonumber(height))
   end
 
   --image modulate
@@ -185,12 +185,12 @@ function text()
 
   --flop image
 
-  if text_flop_a ~= '0' and text_flop_a ~= nil then
+  if flop ~= '0' and flop ~= nil then
     img:flop()
   end
 
   --flip image
-  if text_flip_a ~= '0' and text_flip_a ~= nil then
+  if flip ~= '0' and flip ~= nil then
     img:flip()
   end
 

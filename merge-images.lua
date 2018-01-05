@@ -1,3 +1,5 @@
+print("path")
+
 local secret = "hello_world" -- signature secret key
 local images_dir = "html/user-uploaded-images/" -- where images come from
 local cache_dir = "cache/" -- where images are cached
@@ -21,10 +23,10 @@ area_left, area_top, area_w, area_h, cropped, orders, background,
 four_colour, engrave, sig = 
 (ngx.var.arg_images and ngx.var.arg_images or ""), (ngx.var.arg_cylinder and ngx.var.arg_cylinder or ""),
 (ngx.var.arg_height and ngx.var.arg_height or ""), (ngx.var.arg_width and ngx.var.arg_width or ""),
-(ngx.var.arg_fabric and ngx.var.arg_fabric or ""), (ngx.var.arg_compose_x and ngx.var.arg_compose_x or ""),
-(ngx.var.arg_compose_y and ngx.var.arg_compose_y or ""), (ngx.var.arg_area_left and ngx.var.arg_area_left or ""),
-(ngx.var.arg_area_top and ngx.var.arg_area_top or ""), (ngx.var.arg_area_w and ngx.var.arg_area_w or ""),
-(ngx.var.arg_area_h and ngx.var.arg_area_h or ""), (ngx.var.arg_cropped and ngx.var.arg_cropped or ""),
+(ngx.var.arg_fabric and ngx.var.arg_fabric or ""), (ngx.var.arg_c_x and ngx.var.arg_c_x or ""),
+(ngx.var.arg_c_y and ngx.var.arg_c_y or ""), (ngx.var.arg_a_l and ngx.var.arg_a_l or ""),
+(ngx.var.arg_a_t and ngx.var.arg_a_t or ""), (ngx.var.arg_a_w and ngx.var.arg_a_w or ""),
+(ngx.var.arg_a_h and ngx.var.arg_a_h or ""), (ngx.var.arg_cropped and ngx.var.arg_cropped or ""),
 (ngx.var.arg_orders and ngx.var.arg_orders or ""), (ngx.var.arg_back and ngx.var.arg_back or ""),
 (ngx.var.arg_f_color and ngx.var.arg_f_color or ""), (ngx.var.arg_engrave and ngx.var.arg_engrave or ""),
 (ngx.var.arg_sig and ngx.var.arg_sig or "")
@@ -99,15 +101,13 @@ width_x = stringToArray(width)
 images_a = stringToArray(images)
 
 local dest_fname = cache_dir .. calculated_sig .. "." .. ext
+
 local imgSrc = magick.load_image("html/product-images/" .. path)
 imgSrc:resize(tonumber(product_w),tonumber(product_h))
 
-
+local img
 function image(j)
-    print(j)
-    print(images_a[j])
-    local img = magick.load_image("cache/" .. images_a[j])
-
+    img = magick.load_image("cache/" .. images_a[j])
     if ngx.var.arg_fabric then
         local cmp_x,cmp_y = images_x[j],images_y[j]  
         local cordinate = width_x[j] .. 'x' .. height_x[j] .. '+' .. cmp_x .. '+' .. cmp_y
@@ -120,10 +120,12 @@ function image(j)
         img = imgSrc
     end
 
+    print(area_left .. '===' .. images_x[j])
+
     x_cord_x = tonumber(area_left) - tonumber(images_x[j])
     y_cord_x = tonumber(area_top) - tonumber(images_y[j])
 
-    -- print(x_cord_x .. y_cord_x)
+    print(x_cord_x .. '===' .. y_cord_x)
     -- print(artwork_width .. artwork_height)
 
 
@@ -149,6 +151,7 @@ function image(j)
             composite_y = tonumber(cmp_y)
         end
         imgSrc:composite(img, composite_x, composite_y, "SrcOverCompositeOp")
+        -- imgSrc:composite(img, 0, 0, "SrcOverCompositeOp")
     end
 
     if background_a ~= nil and background_a ~= '' then
