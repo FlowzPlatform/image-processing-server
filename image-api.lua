@@ -141,132 +141,132 @@ end
 
 local img
 
-function text()
-  -- body
-  local img
-  img = magick.new_image(tonumber(area_w), tonumber(area_h))
-  text_location = '/home/software/new/virtual-ssr/static/fonts/'
-  local fontF = text_location .. font_family
+-- function text()
+--   -- body
+--   local img
+--   img = magick.new_image(tonumber(area_w), tonumber(area_h))
+--   text_location = '/home/software/new/virtual-ssr/static/fonts/'
+--   local fontF = text_location .. font_family
 
-  img:textToImage(ngx.unescape_uri(text), fontF, tonumber(font_size), "#"..textColor, 1, {tonumber(text_curve)});
+--   img:textToImage(ngx.unescape_uri(text), fontF, tonumber(font_size), "#"..textColor, 1, {tonumber(text_curve)});
 
-  if ngx.var.arg_height and crop ~= "1" then
-    img:resize(tonumber(width), tonumber(height))
-  end
+--   if ngx.var.arg_height and crop ~= "1" then
+--     img:resize(tonumber(width), tonumber(height))
+--   end
 
-  -- blur image
-  if ngx.var.arg_blur and ngx.var.arg_blur ~= '' then
-    img:blur(4, 0)
-  end
+--   -- blur image
+--   if ngx.var.arg_blur and ngx.var.arg_blur ~= '' then
+--     img:blur(4, 0)
+--   end
 
-  --rotate image
-  --Note: for graphicmagick, this is not available
-  if text_rotate_a then
-    img:rotate(tonumber(rotate), 0, 0, 1)
-  end
+--   --rotate image
+--   --Note: for graphicmagick, this is not available
+--   if text_rotate_a then
+--     img:rotate(tonumber(rotate), 0, 0, 1)
+--   end
 
-  if ngx.var.arg_distort then
-    local xxx = img:distortImage()
-  end
+--   if ngx.var.arg_distort then
+--     local xxx = img:distortImage()
+--   end
 
-  if ngx.var.arg_crop then
-    img:resize_and_crop(tonumber(width), tonumber(height))
-  end
+--   if ngx.var.arg_crop then
+--     img:resize_and_crop(tonumber(width), tonumber(height))
+--   end
 
-  --image modulate
-  if ngx.var.arg_modulate then
-    img:modulate(100,100,200)
-  end
+--   --image modulate
+--   if ngx.var.arg_modulate then
+--     img:modulate(100,100,200)
+--   end
 
-  --set image quality
-  if ngx.var.arg_quality then
-    img:set_quality(tonumber(ngx.var.arg_quality))
-  end
+--   --set image quality
+--   if ngx.var.arg_quality then
+--     img:set_quality(tonumber(ngx.var.arg_quality))
+--   end
 
-  --flop image
+--   --flop image
 
-  if flop ~= '0' and flop ~= nil then
-    img:flop()
-  end
+--   if flop ~= '0' and flop ~= nil then
+--     img:flop()
+--   end
 
-  --flip image
-  if flip ~= '0' and flip ~= nil then
-    img:flip()
-  end
+--   --flip image
+--   if flip ~= '0' and flip ~= nil then
+--     img:flip()
+--   end
 
-  --negate the image
-  if ngx.var.arg_negate then
-    img:negate(true)
-  end
+--   --negate the image
+--   if ngx.var.arg_negate then
+--     img:negate(true)
+--   end
 
-  --colorize image
-  if ngx.var.arg_colorize then
-    local hex = ngx.var.arg_colorize:gsub("#","")
-    local r,g,b = tonumber("0x"..hex:sub(1,2)), tonumber("0x"..hex:sub(3,4)), tonumber("0x"..hex:sub(5,6))
-    img:imageColor(r,g,b)
-  end
+--   --colorize image
+--   if ngx.var.arg_colorize then
+--     local hex = ngx.var.arg_colorize:gsub("#","")
+--     local r,g,b = tonumber("0x"..hex:sub(1,2)), tonumber("0x"..hex:sub(3,4)), tonumber("0x"..hex:sub(5,6))
+--     img:imageColor(r,g,b)
+--   end
 
-  if ngx.var.arg_emboss then
-    img:custom_emboss(2, 90.0, 90.0, 8.0, 0.0, 42, 0.0)
-  end
+--   if ngx.var.arg_emboss then
+--     img:custom_emboss(2, 90.0, 90.0, 8.0, 0.0, 42, 0.0)
+--   end
 
-  if ngx.var.arg_debose then
+--   if ngx.var.arg_debose then
 
-  end
+--   end
 
-  -- if ngx.var.arg_single_color then
-  --   local hex = ngx.var.arg_single_color:gsub("#","")
-  --   local r,g,b = tonumber("0x"..hex:sub(1,2)), tonumber("0x"..hex:sub(3,4)), tonumber("0x"..hex:sub(5,6))
-  --   img:single_color("rgb("..r..","..g..","..b..")",20)
-  -- end
+--   -- if ngx.var.arg_single_color then
+--   --   local hex = ngx.var.arg_single_color:gsub("#","")
+--   --   local r,g,b = tonumber("0x"..hex:sub(1,2)), tonumber("0x"..hex:sub(3,4)), tonumber("0x"..hex:sub(5,6))
+--   --   img:single_color("rgb("..r..","..g..","..b..")",20)
+--   -- end
 
-  if ngx.var.arg_charcoal then
-    img:charcoalImage(0,0)
-  end
+--   if ngx.var.arg_charcoal then
+--     img:charcoalImage(0,0)
+--   end
 
 
-  if ngx.var.arg_fire then
-    img:coloration(0.0,50.0,0.0);
-  end
+--   if ngx.var.arg_fire then
+--     img:coloration(0.0,50.0,0.0);
+--   end
 
-  if ngx.var.arg_wooden then
-    local woodenImg = magick.load_image("html/wood.jpg")
-    woodenImg:wooden(img, "carve", 12, 3, "25", 0.0, 135, 2, 40, "black,white", 125.0, 100.0, 1)
-    img = woodenImg
-  end
+--   if ngx.var.arg_wooden then
+--     local woodenImg = magick.load_image("html/wood.jpg")
+--     woodenImg:wooden(img, "carve", 12, 3, "25", 0.0, 135, 2, 40, "black,white", 125.0, 100.0, 1)
+--     img = woodenImg
+--   end
 
-  if ngx.var.arg_bevel then
-    img:bevel("inner", 135.0, 30.0, 100.0, 5.0, 4.0, "smooth", "lowered", "", "black", "dark")
-  end
+--   if ngx.var.arg_bevel then
+--     img:bevel("inner", 135.0, 30.0, 100.0, 5.0, 4.0, "smooth", "lowered", "", "black", "dark")
+--   end
 
-  if ngx.var.arg_deep_etch then
-    img:deep_etch()
-  end
+--   if ngx.var.arg_deep_etch then
+--     img:deep_etch()
+--   end
 
-  if ngx.var.arg_four_colour then
-    img:four_colour()
-  end
+--   if ngx.var.arg_four_colour then
+--     img:four_colour()
+--   end
 
-  if ngx.var.arg_dominant_color then
-    local color = img:dominant_color();
-  end
+--   if ngx.var.arg_dominant_color then
+--     local color = img:dominant_color();
+--   end
 
-  if ngx.var.arg_foil then
-      imgSrc:composite(img, 0, 0, "AtopCompositeOp")
-      img = imgSrc
-  end
+--   if ngx.var.arg_foil then
+--       imgSrc:composite(img, 0, 0, "AtopCompositeOp")
+--       img = imgSrc
+--   end
 
-  if ngx.var.arg_gel_dom then
-    img:gel_dom();
-  end
+--   if ngx.var.arg_gel_dom then
+--     img:gel_dom();
+--   end
 
-  if ngx.var.arg_toneontoneImage then
-    img:toneontoneImage();
-    local x, y = (imgSrc:get_width()-img:get_width())/2, (imgSrc:get_height()-img:get_height())/2
-    imgSrc:composite(img, x, y, "OverCompositeOp")
-    img = imgSrc
-  end
-end
+--   if ngx.var.arg_toneontoneImage then
+--     img:toneontoneImage();
+--     local x, y = (imgSrc:get_width()-img:get_width())/2, (imgSrc:get_height()-img:get_height())/2
+--     imgSrc:composite(img, x, y, "OverCompositeOp")
+--     img = imgSrc
+--   end
+-- end
 
 function image()
     if ngx.var.arg_text and ngx.var.arg_text ~= '' then
@@ -299,9 +299,8 @@ function image()
     end
 
     --rotate image
-    --Note: for graphicmagick, this is not available
-    if rotate ~= '' then
-      img:rotate(tonumber(rotate), 0, 0, 1)
+    if ngx.var.arg_rotate and ngx.var.arg_rotate ~= '' then
+      img:rotate(tonumber(ngx.var.arg_rotate), 0, 0, 1)
     end
 
     if ngx.var.arg_distort then
@@ -328,12 +327,12 @@ function image()
     end
 
     --flop image
-    if ngx.var.arg_flop and ngx.var.arg_flop ~= '' then
+    if ngx.var.arg_flop and ngx.var.arg_flop ~= '0' then
       img:flop()
     end
 
     --flip image
-    if ngx.var.arg_flip and ngx.var.arg_flip ~= '' then
+    if ngx.var.arg_flip and ngx.var.arg_flip ~= '0' then
       img:flip()
     end
 
@@ -367,7 +366,8 @@ function image()
       img:charcoalImage(0,0)
     end
 
-    if ngx.var.arg_glass then
+    if ngx.var.arg_glass and ngx.var.arg_glass~= '' then
+      print("glass")
       img:glassImage();
     end
 
@@ -403,6 +403,11 @@ function image()
 
     if ngx.var.arg_toneontoneImage and ngx.var.arg_toneontoneImage ~= '' then
       img:toneontoneImage();
+    end
+
+    if ngx.var.arg_foil and ngx.var.arg_foil ~='' then
+      local imgSrc = magick.load_image("html/yellow.gif.jpg")
+      img:composite(imgSrc, 0, 0, "AtopCompositeOp")
     end
 
     -- if background_a ~= nil and background_a ~= '' then

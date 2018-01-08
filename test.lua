@@ -36,7 +36,7 @@ elseif ngx.var.arg_leather_engrave then
 elseif ngx.var.arg_glass_image then
   img = magick.load_image("html/single_color.png")
 elseif ngx.var.arg_foil then
-  img = magick.load_image("html/1492085906_signet-logo.png")
+  img = magick.load_image("html/four.png")
 elseif ngx.var.arg_text then
   img = magick.new_image(500,70)
 else

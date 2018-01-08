@@ -1,5 +1,3 @@
-print("path")
-
 local secret = "hello_world" -- signature secret key
 local images_dir = "html/user-uploaded-images/" -- where images come from
 local cache_dir = "cache/" -- where images are cached
@@ -85,7 +83,7 @@ function explode(d,p)
 end
 
 function process_img()
-    print(orders)
+    -- print(orders)
     orders_x = stringToArray(orders)
     for i, v in ipairs(orders_x) do      
         local order = explode("-", v)
@@ -108,29 +106,33 @@ imgSrc:resize(tonumber(product_w),tonumber(product_h))
 local img
 function image(j)
     img = magick.load_image("cache/" .. images_a[j])
-    if ngx.var.arg_fabric then
-        local cmp_x,cmp_y = images_x[j],images_y[j]  
-        local cordinate = width_x[j] .. 'x' .. height_x[j] .. '+' .. cmp_x .. '+' .. cmp_y
-        img:tshirt(imgSrc, "", cordinate, "none", "center", 0, "", 0, 20, 1, 10, 1, 2, "no")    
-    end
+    local height, width = img:get_height(), img:get_width()
 
-    if ngx.var.arg_leather_engrave then
-        img:leather_engrave(imgSrc)
-        imgSrc:composite(img, 120, 300, "OverCompositeOp")
-        img = imgSrc
-    end
-
-    print(area_left .. '===' .. images_x[j])
+    -- print(area_left .. '===' .. images_x[j])
+    -- print(area_top .. '===' .. images_y[j])
 
     x_cord_x = tonumber(area_left) - tonumber(images_x[j])
     y_cord_x = tonumber(area_top) - tonumber(images_y[j])
 
-    print(x_cord_x .. '===' .. y_cord_x)
-    -- print(artwork_width .. artwork_height)
+    -- print(x_cord_x .. '===' .. y_cord_x)
+    -- print(area_w .."===".. area_h)
 
 
     img:crop(tonumber(area_w), tonumber(area_h), x_cord_x, y_cord_x)
     
+    if ngx.var.arg_fabric then
+        local cmp_x,cmp_y = images_x[j],images_y[j]
+
+        local cordinate = width .. 'x' .. height .. '+' .. cmp_x .. '+' .. cmp_y
+        img:tshirt(imgSrc, "", cordinate, "none", "center", 0, "", 0, 20, 1, 10, 1, 2, "no")    
+    end
+
+    if ngx.var.arg_leather and ngx.var.arg_leather ~= '' then
+        img:leather_engrave(imgSrc)
+        -- imgSrc:composite(img, 120, 300, "OverCompositeOp")
+        -- img = imgSrc
+    end
+
     if background ~= nil and background ~= '' then 
         img:transparent_background(background)
     end
@@ -138,7 +140,7 @@ function image(j)
     cmp_x,cmp_y = images_x[j],images_y[j]
     local x, y = (imgSrc:get_width()-img:get_width())/2, (imgSrc:get_height()-img:get_height())/2
 
-    if ngx.var.arg_fabric then
+    if ngx.var.arg_fabric  and ngx.var.arg_fabric ~= '' then
         imgSrc:composite(img, 0, 0, "SrcOverCompositeOp")
     else      
         local composite_x, composite_y

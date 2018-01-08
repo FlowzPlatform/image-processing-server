@@ -598,3 +598,5 @@
 2018/01/05 16:53:14 [alert] 13522#0: lua_code_cache is off; this will hurt performance in /home/software/github/openresty-lua/nginx.conf:11
 2018/01/05 17:07:21 [alert] 15641#0: lua_code_cache is off; this will hurt performance in /home/software/github/openresty-lua/nginx.conf:11
 2018/01/05 17:35:59 [alert] 19380#0: lua_code_cache is off; this will hurt performance in /home/software/github/openresty-lua/nginx.conf:11
+2018/01/08 10:26:57 [alert] 5638#0: lua_code_cache is off; this will hurt performance in /home/software/github/openresty-lua/nginx.conf:11
+2018/01/08 12:08:50 [alert] 20184#0: lua_code_cache is off; this will hurt performance in /home/software/github/openresty-lua/nginx.conf:11
