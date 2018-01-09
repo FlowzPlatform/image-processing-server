@@ -85,7 +85,6 @@ do
       return true
     end,
     resize = function(self, w, h, f, blur)
-
       if f == nil then
         f = "Lanczos2"
       end
@@ -140,19 +139,22 @@ do
       return handle_result(self, lib.MagickSharpenImage(self.wand, radius, sigma))
     end,
     rotate = function(self, degrees, r, g, b)
-      if r == nil then
-        r = 0
-      end
-      if g == nil then
-        g = 0
-      end
-      if b == nil then
-        b = 0
-      end
+      -- if r == nil then
+      --   r = 255
+      -- end
+      -- if g == nil then
+      --   g = 255
+      -- end
+      -- if b == nil then
+      --   b = 255
+      -- end
+      r,g,b = 255,255,255
       local pixel = ffi.gc(lib.NewPixelWand(), lib.DestroyPixelWand)
       lib.PixelSetRed(pixel, r)
       lib.PixelSetGreen(pixel, g)
       lib.PixelSetBlue(pixel, b)
+      lib.PixelSetAlpha(pixel,0.0)
+
       local res = {
           handle_result(self, lib.MagickRotateImage(self.wand, pixel, degrees))
       }
@@ -448,14 +450,13 @@ do
     end,
 
     custom_cylinderize = function(self, mod, radius, length, wrap, pitch, efact, angle, narrow)
-
       local mod = ffi.new("char[?]", 10, mod)
 
       -- local arg = ffi.new("NULL", nil)
       -- local test =  handle_result(self, lib.MagickCylinderize(self.wand,"vertical",0,0,0,0,0,0))
       -- -r 472.03813405274 -l 356.029 -w 16.6667 -p 18.145578659481 -n 90.686478261958 -e 1.75
       -- local test =  handle_result(self, lib.MagickCylinderize(self.wand,"vertical",472.03813405274, 356.029, 16.6667, 18.145578659481, 1.75, 0.0,90.00))
-      local test =  handle_result(self, lib.MagickCylinderize(self.wand, mod, radius, length, wrap, pitch, efact, angle, narrow))
+      local test = handle_result(self, lib.MagickCylinderize(self.wand, mod, radius, length, wrap, pitch, efact, angle, narrow))
       -- 366.34955984688, 188.179, 16.6667, 23.428692808745, 1.75, 0.0
       return test
     end,
@@ -574,15 +575,28 @@ do
 
     end,
 
-    four_colour = function(self)
-
+    four_colour = function(self, width, height, shape, plate_color)
+      print(width)
+      print(height)
+      
+      local x0 = width/2
+      local y0 = height/2
+      
+      local x1 = (width)/2
+      local y1 = (y0)/2
+      
+      if y1 < 30 then 
+        y1 = 30
+      end
+    
       lib.MagickSetImageAlphaChannel(self.wand,9)
       local cloneWand = self.clone(self)
       local dwand = ffi.gc(lib.NewDrawingWand(), lib.DestroyDrawingWand)
       --
       lib.MagickThresholdImage(cloneWand.wand, 1.0)
       self.negate(cloneWand, 0)
-      lib.DrawEllipse(dwand, 254.27, 121.0, 254.27, 60.5, 0, 360)
+      -- lib.DrawEllipse(dwand, 254.27, 121.0, 254.27, 60.5, 0, 360)
+      lib.DrawEllipse(dwand, x0, y0, x1, y1, 0, 360)
 
       local pixel1 = ffi.gc(lib.NewPixelWand(), lib.DestroyPixelWand)
       local pixel2= ffi.gc(lib.NewPixelWand(), lib.DestroyPixelWand)
@@ -638,13 +652,19 @@ do
       self:negate(0)
     end,
 
-    glassImage = function(self)
-      self:single_color("rgb(229,229,229)",20)
-      self:custom_emboss(1, 135.0, 40.0, 10.0, 0.0, 42, 0.0)
-
-      -- 'convert '. $newimage .' -alpha set -evaluate set 90% '.$newimage
-      lib.MagickSetImageAlphaChannel(self.wand,13)
-      -- handle_result(self, lib.MagickEvaluateImage(self.wand, 0, 90.0*65535.0*0.01))
+    glassImage = function(self, logoColor)
+      if logoColor and  logoColor ~= '' then
+        
+        print(logoColor)
+        self:single_color(logoColor,20)
+        self:custom_emboss(1, 135.0, 10.0, 2.0, 0.0, 42, 0.0)      
+      else
+        self:single_color("rgb(229,229,229)",20)
+        self:custom_emboss(1, 135.0, 40.0, 10.0, 0.0, 42, 0.0)
+        -- 'convert '. $newimage .' -alpha set -evaluate set 90% '.$newimage
+        lib.MagickSetImageAlphaChannel(self.wand,13)
+        -- handle_result(self, lib.MagickEvaluateImage(self.wand, 0, 90.0*65535.0*0.01))
+      end
     end,
 
     deboss = function(self)
@@ -654,7 +674,7 @@ do
       self:negate(0)
     end,
 
-    textToImage = function(self,text, font, textSize, textColor, no_args, args)
+    textToImage = function(self, text, font, textSize, textColor, no_args, args)
       local font = ffi.new("char[?]", 100, font)
       local text = ffi.new("char[?]", 50, text)
       local textColor = ffi.new("char[?]", 50, textColor)
@@ -664,6 +684,13 @@ do
 
       handle_result(self, lib.MagickSetTextToImage(self.wand, font, text, textSize, textColor, no_args, arguments))
       return true
+    end,
+
+    transparent_background = function(self, target_color)
+      local pixel = ffi.gc(lib.NewPixelWand(), lib.DestroyPixelWand)
+      lib.PixelSetColor(pixel, target_color)
+
+      handle_result(self, lib.MagickTransparentPaintImage(self.wand, pixel, 0.0, 20.0*65535.0/100.0, 0))
     end,
 
     __tostring = function(self)
