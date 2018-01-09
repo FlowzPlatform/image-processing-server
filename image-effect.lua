@@ -383,7 +383,9 @@ function image()
     end
 
     if ngx.var.arg_four_colour then
-      img:four_colour()
+      print(img:get_width())
+      print(img:get_height())
+      img:four_colour(img:get_width(), img:get_height(), 'oval', '000000')
     end
 
     if ngx.var.arg_dominant_color then

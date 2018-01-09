@@ -20,7 +20,7 @@ engrave, four_colour, dcolor, foil, geldom, toneontone, background, cropped = (n
 (ngx.var.arg_fabric and ngx.var.arg_fabric .. "fabric" or ""), (ngx.var.arg_deep_etch and ngx.var.arg_deep_etch .. "deep_etch" or ""),
 (ngx.var.arg_leather_engrave and ngx.var.arg_leather_engrave .. "engrave" or ""), (ngx.var.arg_four_colour and ngx.var.arg_four_colour .. "four_colour" or ""),
 (ngx.var.arg_dominant_color and ngx.var.arg_dominant_color .. "dominant_color" or ""), (ngx.var.arg_foil and ngx.var.arg_foil .. "foil" or ""),
-(ngx.var.arg_gel_dom and ngx.var.arg_gel_dom .. "gel_dom" or ""), (ngx.var.arg_toneontoneImage and ngx.var.arg_toneontoneImage .. "toneontoneImage" or ""),
+(ngx.var.arg_gel_dom and ngx.var.arg_gel_dom .. "gel_dom" or ""), (ngx.var.arg_tone_on_tone and ngx.var.arg_tone_on_tone .. "toneontoneImage" or ""),
 (ngx.var.arg_back and ngx.var.arg_back or ""), (ngx.var.arg_cropped and ngx.var.arg_cropped .. 'cropped' or "")
 
 local compose_x, compose_y = (ngx.var.arg_compose_x and ngx.var.arg_compose_x or "") , (ngx.var.arg_compose_y and ngx.var.arg_compose_y or "")
@@ -280,7 +280,6 @@ function image()
       img:textToImage(ngx.unescape_uri(ngx.var.arg_text), fontF, tonumber(font_size), "#"..textColor, 1, {tonumber(text_curve)})
     else
       local source_fname = images_dir .. path
-      print(source_fname)
       local file = io.open(source_fname)
       if not file then
         return_not_found()
@@ -366,9 +365,14 @@ function image()
       img:charcoalImage(0,0)
     end
 
-    if ngx.var.arg_glass and ngx.var.arg_glass~= '' then
-      print("glass")
+    if ngx.var.arg_laser and ngx.var.arg_laser~= '' then
       img:glassImage();
+    end
+
+    if ngx.var.arg_glass and ngx.var.arg_glass~= '' then
+      local hex = ngx.var.arg_glass:gsub("#","")
+      local r,g,b = tonumber("0x"..hex:sub(1,2)), tonumber("0x"..hex:sub(3,4)), tonumber("0x"..hex:sub(5,6))
+      img:glassImage("rgb("..r..","..g..","..b..")")
     end
 
     if ngx.var.arg_fire and ngx.var.arg_fire ~='' then
@@ -389,21 +393,35 @@ function image()
       img:deep_etch()
     end
 
-    if ngx.var.arg_four_colour then
-      img:four_colour()
+    if ngx.var.arg_four_colour_dome and  ngx.var.arg_four_colour_dome ~= '' then
+      img:four_colour(img:get_width(), img:get_height(), 'oval', '000000')
+    end
+
+    if ngx.var.arg_one_color and  ngx.var.arg_one_color ~= '' then
+      local hex = ngx.var.arg_one_color:gsub("#","")
+      local r,g,b = tonumber("0x"..hex:sub(1,2)), tonumber("0x"..hex:sub(3,4)), tonumber("0x"..hex:sub(5,6))
+      img:single_color("rgb("..r..","..g..","..b..")",20)
     end
 
     if ngx.var.arg_dominant_color then
       local color = img:dominant_color();
     end
 
-    if ngx.var.arg_gel_dom then
+    if ngx.var.arg_gel_dom and ngx.var.arg_gel_dom ~= '' then
       img:gel_dom()
     end
 
-    if ngx.var.arg_toneontoneImage and ngx.var.arg_toneontoneImage ~= '' then
+    if ngx.var.arg_tone_on_tone and ngx.var.arg_tone_on_tone ~= '' then
       img:toneontoneImage();
     end
+
+    if ngx.var.arg_hot_stamp and ngx.var.arg_hot_stamp ~= '' then
+      local hex = ngx.var.arg_hot_stamp:gsub("#","")
+      local r,g,b = tonumber("0x"..hex:sub(1,2)), tonumber("0x"..hex:sub(3,4)), tonumber("0x"..hex:sub(5,6))
+      img:single_color("rgb("..r..","..g..","..b..")",20)
+    end
+
+    
 
     if ngx.var.arg_foil and ngx.var.arg_foil ~='' then
       local imgSrc = magick.load_image("html/yellow.gif.jpg")

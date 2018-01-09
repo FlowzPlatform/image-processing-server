@@ -22,7 +22,7 @@ local img
 if ngx.var.arg_tshirt then
   img = magick.load_image("html/place.jpg")
 elseif ngx.var.arg_four_colour then
-  img = magick.load_image("html/four.png")
+  img = magick.load_image("html/foil.png")
 elseif ngx.var.arg_custom_emboss then
   img = magick.load_image("html/lena.jpg")
 elseif ngx.var.arg_wooden then
@@ -242,7 +242,9 @@ if ngx.var.arg_leather_engrave then
 end
 
 if ngx.var.arg_four_colour then
-  img:four_colour()
+  print(img:get_width())
+  print(img:get_height())
+  img:four_colour(img:get_width(), img:get_height(), 'oval', '000000')
 end
 
 if ngx.var.arg_dominant_color then
