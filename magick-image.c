@@ -13081,6 +13081,7 @@ WandExport MagickBooleanType MagickCustomEmboss(MagickWand *wand, int method, do
 
       CompositeImage(wand2->images, wand3->images, BlendCompositeOp, MagickFalse, 0, 0, wand->exception);
 
+      // need to change
       LevelImage(wand2->images, QuantumRange, 0, 1.0, wand->exception);
 
       CompositeImage(wand->images, wand2->images, compose, MagickFalse, 0, 0, wand->exception);
@@ -13131,6 +13132,7 @@ WandExport MagickBooleanType MagickCustomEmboss(MagickWand *wand, int method, do
 
       CompositeImage(wand->images, wand3->images, BlendCompositeOp, MagickFalse, 0, 0, wand->exception);
 
+      // need to change
       LevelImage(wand->images, QuantumRange, 0.0, 1.0, wand->exception);
 
     }
@@ -13139,19 +13141,25 @@ WandExport MagickBooleanType MagickCustomEmboss(MagickWand *wand, int method, do
     return(status);
   }else{
       Image * shade_image;
-      TransformImageColorspace(wand->images, GRAYColorspace, wand->exception);
+      MagickWand * wand1;
+      wand1 = CloneMagickWand(wand);
 
-      shade_image = ShadeImage(wand->images, MagickTrue, azimuth, elevation, wand->exception);
-      ReplaceImageInList(&wand->images,shade_image);
+      TransformImageColorspace(wand1->images, GRAYColorspace, wand1->exception);
+
+      shade_image = ShadeImage(wand1->images, MagickTrue, azimuth, elevation, wand1->exception);
+      ReplaceImageInList(&wand1->images,shade_image);
 
       double mean,sd;
-      GetImageMean(wand->images, &mean, &sd, wand->exception);
+      GetImageMean(wand1->images, &mean, &sd, wand1->exception);
       double x, y;
       x = depth;
       y = (mean/QuantumRange)*(1.0-x);
 
       const double arguments[2] = {x, y};
-      FunctionImage(wand->images, PolynomialFunction, 2, arguments, wand->exception);
+      FunctionImage(wand1->images, PolynomialFunction, 2, arguments, wand1->exception);
+
+      CompositeImage(wand->images, wand1->images, compose, MagickFalse, 0, 0, wand->exception);
+
       status = MagickTrue;
       return(status);
   }
@@ -13881,7 +13889,7 @@ WandExport MagickWand *MagickTshirtImage(MagickWand *place, MagickWand *tshirt, 
   return(wand7);
 }
 
-WandExport MagickBooleanType MagickSetTextToImage(MagickWand *wand, char *font, char *text, int fontSize)
+WandExport MagickBooleanType MagickSetTextToImage(MagickWand *wand, char *font, char *text, int fontSize, char *fontColor, int args, double *arguments)
 {
   DrawingWand *d_wand;
   PixelWand *p_wand;
@@ -13905,7 +13913,7 @@ WandExport MagickBooleanType MagickSetTextToImage(MagickWand *wand, char *font, 
   // InsertImageInWand(wand, images);
 
 	// Set up a 72 point white font
-	PixelSetColor(p_wand,"white");
+	PixelSetColor(p_wand,fontColor);
   // PixelInfo pixel2;
   // QueryColorCompliance("white", AllCompliance, &pixel2, p_wand->exception);
   // p_wand->pixel=pixel2;
@@ -13951,7 +13959,7 @@ WandExport MagickBooleanType MagickSetTextToImage(MagickWand *wand, char *font, 
   // }
 
 	// Add a black outline to the text
-	PixelSetColor(p_wand,"black");
+	// PixelSetColor(p_wand,"black");
   // PixelInfo pixel3;
   // QueryColorCompliance("black", AllCompliance, &pixel3, p_wand->exception);
   // p_wand->pixel=pixel3;
@@ -13978,7 +13986,7 @@ WandExport MagickBooleanType MagickSetTextToImage(MagickWand *wand, char *font, 
   // }
 
 	// Now draw the text
-	DrawAnnotation(d_wand,50,50,text);
+	DrawAnnotation(d_wand,25,65,text);
   // escaped_text=EscapeString((const char *) text,'\'');
   // if (escaped_text != (char *) NULL)
   // {
@@ -13998,13 +14006,16 @@ WandExport MagickBooleanType MagickSetTextToImage(MagickWand *wand, char *font, 
   DrawImage(wand->images,draw_info,wand->exception);
   draw_info=DestroyDrawInfo(draw_info);
 
+
+  MagickDistortImage(wand, ArcDistortion, args, arguments, MagickTrue);
+
 	// Trim the image down to include only the text
-	// MagickTrimImage(magick_wand,0);
-  Image *trim_image;
-  wand->images->fuzz=0;
-  trim_image=TrimImage(wand->images,wand->exception);
-  if (trim_image == (Image *) NULL)
-  ReplaceImageInList(&wand->images,trim_image);
+	MagickTrimImage(wand,0);
+  // Image *trim_image;
+  // wand->images->fuzz=0;
+  // trim_image=TrimImage(wand->images,wand->exception);
+  // if (trim_image == (Image *) NULL)
+  // ReplaceImageInList(&wand->images,trim_image);
 
   return (status);
 

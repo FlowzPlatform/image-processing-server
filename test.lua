@@ -41,7 +41,7 @@ elseif ngx.var.arg_text then
   img = magick.new_image(500,70)
 else
 
-  img = magick.load_image("html/shirt-1490420206-a15bc00a09077730c2a8dd98907d1b10.jpg")
+  img = magick.load_image("html/google.png")
   -- img = magick.load_image("html/wood.jpg")
 end
 -- img = 
@@ -318,6 +318,6 @@ write image physically and display
 -- img:transparent_background('white')
 
 
-img:write("html/resized.jpg")
+img:write("html/resized.png")
 img:destroy()
-ngx.exec("/resized.jpg")
+ngx.exec("/resized.png")

@@ -331,7 +331,7 @@ extern WandExport MagickBooleanType
   MagickCustomEmboss(MagickWand *, int , double , double , double , double , const CompositeOperator, double),
   MagickColoration(MagickWand *, double , double , double),
   MagickSetWooden(MagickWand *, MagickWand *, char *, int, int, char *, double, int, int, int, char *, double, double, int),
-  MagickSetTextToImage(MagickWand *, char * , char * , int);
+  MagickSetTextToImage(MagickWand *, char * , char * , int, char *, int, double *);
 
 extern WandExport MagickProgressMonitor
   MagickSetImageProgressMonitor(MagickWand *,const MagickProgressMonitor,

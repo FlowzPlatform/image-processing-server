@@ -5,12 +5,14 @@ ngx.header["Access-Control-Allow-Credentials"] = "true"
 
 
 local sig, size, path, ext = ngx.var.arg_sig, ngx.var.arg_size, ngx.var.path, ngx.var.ext
-local height, width, rotate, single_color = (ngx.var.arg_h and ngx.var.arg_h or ""), (ngx.var.arg_w and ngx.var.arg_w or ""),
-(ngx.var.arg_rotate and ngx.var.arg_rotate or ""), (ngx.var.arg_single_color and ngx.var.arg_single_color or "")
+local height, width, rotate, single_color, glass, one_color = (ngx.var.arg_h and ngx.var.arg_h or ""), (ngx.var.arg_w and ngx.var.arg_w or ""),
+(ngx.var.arg_rotate and ngx.var.arg_rotate or ""), (ngx.var.arg_single_color and ngx.var.arg_single_color or ""), (ngx.var.arg_glass and ngx.var.arg_glass or ""),
+(ngx.var.arg_one_color and ngx.var.arg_one_color or "")
 
 local emboss, cylinder, deboss, crop, fire, compose,
 flip, flop, negate, wooden, bevel, fabric, deep_etch,
-engrave, four_colour, dcolor, foil, geldom, toneontone, background, cropped = (ngx.var.arg_emboss and ngx.var.arg_emboss .. "emboss" or ""),
+engrave, four_colour, dcolor, foil, geldom, toneontone, 
+background, cropped, four_color, hot_stamp, four_color_dome, my_lar = (ngx.var.arg_emboss and ngx.var.arg_emboss .. "emboss" or ""),
 (ngx.var.arg_cylinder and ngx.var.arg_cylinder .. "cylinder" or ""),
 (ngx.var.arg_deboss and ngx.var.arg_deboss .. "deboss" or ""),
 (ngx.var.arg_crop and ngx.var.arg_crop .. "crop" or ""), (ngx.var.arg_fire and ngx.var.arg_fire .. "firebranded" or ""),
@@ -21,7 +23,9 @@ engrave, four_colour, dcolor, foil, geldom, toneontone, background, cropped = (n
 (ngx.var.arg_leather_engrave and ngx.var.arg_leather_engrave .. "engrave" or ""), (ngx.var.arg_four_colour and ngx.var.arg_four_colour .. "four_colour" or ""),
 (ngx.var.arg_dominant_color and ngx.var.arg_dominant_color .. "dominant_color" or ""), (ngx.var.arg_foil and ngx.var.arg_foil .. "foil" or ""),
 (ngx.var.arg_gel_dom and ngx.var.arg_gel_dom .. "gel_dom" or ""), (ngx.var.arg_tone_on_tone and ngx.var.arg_tone_on_tone .. "toneontoneImage" or ""),
-(ngx.var.arg_back and ngx.var.arg_back or ""), (ngx.var.arg_cropped and ngx.var.arg_cropped .. 'cropped' or "")
+(ngx.var.arg_back and ngx.var.arg_back or ""), (ngx.var.arg_cropped and ngx.var.arg_cropped .. 'cropped' or ""), (ngx.var.arg_four_color and ngx.var.arg_four_color .. 'four_color' or ""),
+(ngx.var.arg_hot_stamp and ngx.var.arg_hot_stamp .. "hot_stamp" or ""), (ngx.var.arg_four_color_dome and ngx.var.arg_four_color_dome .. "four_color_dome" or ""),
+(ngx.var.arg_my_lar and ngx.var.arg_my_lar .. "my_lar" or "")
 
 local compose_x, compose_y = (ngx.var.arg_compose_x and ngx.var.arg_compose_x or "") , (ngx.var.arg_compose_y and ngx.var.arg_compose_y or "")
 
@@ -67,10 +71,10 @@ end
 
 
 local calculated_sig = calculate_signature(path .. height .. width .. emboss .. cylinder .. deboss .. crop .. fire .. compose .. rotate
-.. flip .. flop .. negate .. wooden .. single_color .. bevel .. fabric .. deep_etch
+.. flip .. flop .. negate .. wooden .. single_color .. bevel .. fabric .. deep_etch .. glass .. one_color .. four_color .. hot_stamp
 .. engrave .. four_colour .. dcolor .. foil .. geldom .. toneontone .. compose_x .. compose_y .. text .. font_size .. area_w .. area_h
 .. font_size .. text_width .. text_height .. text_composex .. text_composey .. text_color .. text_flip .. text_flop .. text_rotate
-.. font_family .. texts .. text_curve .. background .. orders .. cropped)
+.. font_family .. texts .. text_curve .. background .. orders .. cropped .. four_color_dome .. my_lar)
 
 if(calculate_signature("obVMC@123") ~= sig) then
   return_not_found("Invalid signature")
@@ -140,133 +144,6 @@ function explode(d,p)
 end
 
 local img
-
--- function text()
---   -- body
---   local img
---   img = magick.new_image(tonumber(area_w), tonumber(area_h))
---   text_location = '/home/software/new/virtual-ssr/static/fonts/'
---   local fontF = text_location .. font_family
-
---   img:textToImage(ngx.unescape_uri(text), fontF, tonumber(font_size), "#"..textColor, 1, {tonumber(text_curve)});
-
---   if ngx.var.arg_height and crop ~= "1" then
---     img:resize(tonumber(width), tonumber(height))
---   end
-
---   -- blur image
---   if ngx.var.arg_blur and ngx.var.arg_blur ~= '' then
---     img:blur(4, 0)
---   end
-
---   --rotate image
---   --Note: for graphicmagick, this is not available
---   if text_rotate_a then
---     img:rotate(tonumber(rotate), 0, 0, 1)
---   end
-
---   if ngx.var.arg_distort then
---     local xxx = img:distortImage()
---   end
-
---   if ngx.var.arg_crop then
---     img:resize_and_crop(tonumber(width), tonumber(height))
---   end
-
---   --image modulate
---   if ngx.var.arg_modulate then
---     img:modulate(100,100,200)
---   end
-
---   --set image quality
---   if ngx.var.arg_quality then
---     img:set_quality(tonumber(ngx.var.arg_quality))
---   end
-
---   --flop image
-
---   if flop ~= '0' and flop ~= nil then
---     img:flop()
---   end
-
---   --flip image
---   if flip ~= '0' and flip ~= nil then
---     img:flip()
---   end
-
---   --negate the image
---   if ngx.var.arg_negate then
---     img:negate(true)
---   end
-
---   --colorize image
---   if ngx.var.arg_colorize then
---     local hex = ngx.var.arg_colorize:gsub("#","")
---     local r,g,b = tonumber("0x"..hex:sub(1,2)), tonumber("0x"..hex:sub(3,4)), tonumber("0x"..hex:sub(5,6))
---     img:imageColor(r,g,b)
---   end
-
---   if ngx.var.arg_emboss then
---     img:custom_emboss(2, 90.0, 90.0, 8.0, 0.0, 42, 0.0)
---   end
-
---   if ngx.var.arg_debose then
-
---   end
-
---   -- if ngx.var.arg_single_color then
---   --   local hex = ngx.var.arg_single_color:gsub("#","")
---   --   local r,g,b = tonumber("0x"..hex:sub(1,2)), tonumber("0x"..hex:sub(3,4)), tonumber("0x"..hex:sub(5,6))
---   --   img:single_color("rgb("..r..","..g..","..b..")",20)
---   -- end
-
---   if ngx.var.arg_charcoal then
---     img:charcoalImage(0,0)
---   end
-
-
---   if ngx.var.arg_fire then
---     img:coloration(0.0,50.0,0.0);
---   end
-
---   if ngx.var.arg_wooden then
---     local woodenImg = magick.load_image("html/wood.jpg")
---     woodenImg:wooden(img, "carve", 12, 3, "25", 0.0, 135, 2, 40, "black,white", 125.0, 100.0, 1)
---     img = woodenImg
---   end
-
---   if ngx.var.arg_bevel then
---     img:bevel("inner", 135.0, 30.0, 100.0, 5.0, 4.0, "smooth", "lowered", "", "black", "dark")
---   end
-
---   if ngx.var.arg_deep_etch then
---     img:deep_etch()
---   end
-
---   if ngx.var.arg_four_colour then
---     img:four_colour()
---   end
-
---   if ngx.var.arg_dominant_color then
---     local color = img:dominant_color();
---   end
-
---   if ngx.var.arg_foil then
---       imgSrc:composite(img, 0, 0, "AtopCompositeOp")
---       img = imgSrc
---   end
-
---   if ngx.var.arg_gel_dom then
---     img:gel_dom();
---   end
-
---   if ngx.var.arg_toneontoneImage then
---     img:toneontoneImage();
---     local x, y = (imgSrc:get_width()-img:get_width())/2, (imgSrc:get_height()-img:get_height())/2
---     imgSrc:composite(img, x, y, "OverCompositeOp")
---     img = imgSrc
---   end
--- end
 
 function image()
     if ngx.var.arg_text and ngx.var.arg_text ~= '' then
@@ -389,12 +266,16 @@ function image()
       img:bevel("inner", 135.0, 30.0, 100.0, 5.0, 4.0, "smooth", "lowered", "", "black", "dark")
     end
 
-    if ngx.var.arg_deep_etch then
+    if ngx.var.arg_deep_etch and  ngx.var.arg_deep_etch ~= '' then
       img:deep_etch()
     end
 
-    if ngx.var.arg_four_colour_dome and  ngx.var.arg_four_colour_dome ~= '' then
-      img:four_colour(img:get_width(), img:get_height(), 'oval', '000000')
+    if ngx.var.arg_four_color_dome and  ngx.var.arg_four_color_dome ~= '' then
+      img:four_colour(img:get_width(), img:get_height(), 'oval', 'C0C0C0')
+    end
+
+    if ngx.var.arg_my_lar and  ngx.var.arg_my_lar ~= '' then
+      img:four_colour(img:get_width(), img:get_height(), 'oval')
     end
 
     if ngx.var.arg_one_color and  ngx.var.arg_one_color ~= '' then
