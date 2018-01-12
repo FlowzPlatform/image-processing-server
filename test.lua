@@ -41,7 +41,7 @@ elseif ngx.var.arg_text then
   img = magick.new_image(500,70)
 else
 
-  img = magick.load_image("html/google.png")
+  img = magick.load_image("html/logo.png")
   -- img = magick.load_image("html/wood.jpg")
 end
 -- img = 

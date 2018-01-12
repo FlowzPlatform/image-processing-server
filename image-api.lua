@@ -309,11 +309,12 @@ function image()
       img:composite(imgSrc, 0, 0, "AtopCompositeOp")
     end
 
-    -- if background_a ~= nil and background_a ~= '' then
-    --   for i in string.gmatch(background_a, '([^-]+)') do
-    --     img:transparent_background(i)
-    --   end
-    -- end
+    if ngx.var.arg_back and ngx.var.arg_back ~= '' then
+        local backColors = explode("-", ngx.var.arg_back)
+        for i, color in ipairs(backColors) do
+          img:transparent_background(color)
+        end
+    end
 end
 
 process_img()
