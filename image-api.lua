@@ -301,8 +301,10 @@ function image()
       local r,g,b = tonumber("0x"..hex:sub(1,2)), tonumber("0x"..hex:sub(3,4)), tonumber("0x"..hex:sub(5,6))
       img:single_color("rgb("..r..","..g..","..b..")",20)
     end
-
     
+    if ngx.var.arg_deboss and ngx.var.arg_deboss ~= '' then
+      img:deboss()
+    end
 
     if ngx.var.arg_foil and ngx.var.arg_foil ~='' then
       local imgSrc = magick.load_image("html/yellow.gif.jpg")

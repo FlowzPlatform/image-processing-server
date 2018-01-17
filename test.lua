@@ -41,7 +41,7 @@ elseif ngx.var.arg_text then
   img = magick.new_image(500,70)
 else
 
-  img = magick.load_image("html/logo.png")
+  img = magick.load_image("html/google.png")
   -- img = magick.load_image("html/wood.jpg")
 end
 -- img = 
@@ -184,8 +184,8 @@ if ngx.var.arg_custom_emboss then
 
 end
 
-if ngx.var.arg_debose then
-
+if ngx.var.arg_deboss then
+  img:deboss()
 end
 
 if ngx.var.arg_single_color then
