@@ -148,10 +148,11 @@ local img
 function image()
     if ngx.var.arg_text and ngx.var.arg_text ~= '' then
       local textColor = (ngx.var.arg_text_color) and ngx.var.arg_text_color or '000000'
-      local font_size = (ngx.var.arg_font_size) and ngx.var.arg_font_size or 50
+      local font_size = (ngx.var.arg_font_size) and ngx.var.arg_font_size or 20
       local text_curve = (ngx.var.arg_text_curve) and ngx.var.arg_text_curve or 0
+      local font_family = (ngx.var.arg_font_family) and ngx.var.arg_font_family or 'GochiHand-Regular.ttf'
 
-      img = magick.new_image(500, 250)
+      img = magick.new_image(tonumber(width), tonumber(height))
       text_location = '/home/software/new/virtual-ssr/static/fonts/'
       local fontF = text_location .. font_family
       img:textToImage(ngx.unescape_uri(ngx.var.arg_text), fontF, tonumber(font_size), "#"..textColor, 1, {tonumber(text_curve)})
@@ -163,11 +164,13 @@ function image()
       end
       file:close()
       img = magick.load_image(source_fname)
+
+      if height ~= '' and width ~= '' and crop ~= "1" then
+        img:resize(tonumber(width), tonumber(height))
+      end
     end
 
-    if height ~= '' and width ~= '' and crop ~= "1" then
-      img:resize(tonumber(width), tonumber(height))
-    end
+    
 
     -- blur image
     if ngx.var.arg_blur and ngx.var.arg_blur ~= '' then
