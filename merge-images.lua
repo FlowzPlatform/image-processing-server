@@ -114,8 +114,9 @@ function image(j)
     x_cord_x = tonumber(area_left) - tonumber(images_x[j])
     y_cord_x = tonumber(area_top) - tonumber(images_y[j])
 
-    -- print(x_cord_x .. '===' .. y_cord_x)
-    -- print(area_w .."===".. area_h)
+    print(images_a[j])
+    print(x_cord_x .. '===' .. y_cord_x)
+    print(area_w .."===".. area_h)
 
 
     img:crop(tonumber(area_w), tonumber(area_h), x_cord_x, y_cord_x)
